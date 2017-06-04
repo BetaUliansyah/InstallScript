@@ -17,7 +17,7 @@
 ##fixed parameters
 #odoo
 OE_USER="odoo"
-OE_HOME="/$OE_USER"
+OE_HOME="/home/$OE_USER"
 OE_HOME_EXT="/$OE_USER/$OE_USER-server"
 #The default port where this Odoo instance will run under (provided you use the command -c in the terminal)
 #Set to true if you want to install it, false if you don't need it or have it already installed.
@@ -30,7 +30,7 @@ OE_VERSION="8.0"
 OE_PORT="8069"
 #set the superadmin password
 OE_SUPERADMIN="admin"
-OE_CONFIG="$OE_USER-server"
+OE_CONFIG="odoo"
 
 #--------------------------------------------------
 # Update Server
@@ -55,7 +55,7 @@ sudo su - postgres -c "createuser -s $OE_USER" 2> /dev/null || true
 # Install Dependencies
 #--------------------------------------------------
 echo -e "\n---- Install tool packages ----"
-sudo apt-get install wget subversion git bzr bzrtools python-pip -y
+sudo apt-get install wget subversion git bzr bzrtools python-pip screen -y
 	
 echo -e "\n---- Install python packages ----"
 sudo apt-get install python-dateutil python-feedparser python-ldap python-libxslt1 python-lxml python-mako python-openid python-psycopg2 python-pybabel python-pychart python-pydot python-pyparsing python-reportlab python-simplejson python-tz python-vatnumber python-vobject python-webdav python-werkzeug python-xlwt python-yaml python-zsi python-docutils python-psutil python-mock python-unittest2 python-jinja2 python-pypdf python-decorator python-requests python-passlib python-pil -y
@@ -68,8 +68,13 @@ sudo pip install gdata psycogreen ofxparse
 #--------------------------------------------------
 if [ $INSTALL_WKHTMLTOPDF = "True" ]; then
 echo -e "\n---- Install wkhtml and place on correct place for ODOO 8 ----"
-sudo wget http://download.gna.org/wkhtmltopdf/0.12/0.12.1/wkhtmltox-0.12.1_linux-trusty-amd64.deb
-sudo dpkg -i wkhtmltox-0.12.1_linux-trusty-amd64.deb
+if [ "`getconf LONG_BIT`" == "64" ];then
+    _url=$WKHTMLTOX_X64
+else
+    _url=$WKHTMLTOX_X32
+fi
+sudo wget $_url
+sudo gdebi --n `basename $_url`
 sudo cp /usr/local/bin/wkhtmltopdf /usr/bin
 sudo cp /usr/local/bin/wkhtmltoimage /usr/bin
 else
